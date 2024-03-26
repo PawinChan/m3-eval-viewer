@@ -1,0 +1,68 @@
+
+body {
+  font-family: Sarabun, sans-serif;
+  font-weight: 250;
+  background-color: #1a222d;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Ubuntu, sans-serif;
+  margin: 0.5em;
+  font-weight: 350;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+hr {
+  width: 50%;
+  margin-top: 1.5em;
+}
+
+input {
+  display: block;
+  margin: 1em auto;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  width: 24em;
+  background-color: #161f27;
+  color: #ffffff;
+  border: 1px solid #808080;
+
+}
+  
+#graphingArea {
+  /* display: flex;
+  flex-wrap: wrap;
+  justify-content: center; */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: fit-content;
+  margin: auto;
+  justify-content: center;
+}
+
+.graphCanvasContainer {
+  width: 16em; height: 16em;
+}
+
+.graphBox {
+  padding: 1em;
+  background-color: #161f27;
+  margin: 1em;
+  border-radius: 1em;
+}
+
+.graphDescription {
+  text-align: center;
+  font-size: 0.8em;
+  color: #909090;
+  margin-top: 1.5em;
+  margin-bottom: 0;
+}
+
+nonexistent {
+  color: hsla(136, 55%, 43%, 0.509), hsl(45, 90%, 50%), hsl(5, 75%, 56%)
+}
