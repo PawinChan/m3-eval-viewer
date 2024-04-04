@@ -1,5 +1,12 @@
 window.addEventListener('load', checkEncodedData)
+window.addEventListener('load', makeIt4ColumnsIfRequired)
 
+function makeIt4ColumnsIfRequired() {
+  if (getArg('merge') == "true") {
+    graphingArea.style.gridTemplateColumns = "repeat(4, 1fr)"
+  }
+
+}
 function doCapitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
@@ -17,45 +24,76 @@ function openFile(event) {
   reader.readAsText(input.files[0]);
 };
 
-function checkEncodedData() {
-  //decode base64 json from request argument data
+function getArg(key) {
   const urlParams = new URLSearchParams(window.location.search);
-  const b64Data = urlParams.get('data')
+  return urlParams.get(key)
+}
+
+function checkEncodedData() {
+  const b64Data = getArg('data')
   if (b64Data) {
     load_data(atob(b64Data))
   }
 }
 
+
+function getCorrectPercent(data) {
+  console.log(data)
+  return ((data[0] / (data[0] + data[1] + data[2])) * 100)
+
+}
+
 async function load_data(jsonData) {
   const data = JSON.parse(jsonData)
-  for (const [subjectName, subjectData] of Object.entries(data)) {
-    for (const difficulty of ['low', 'mid', 'high']) { 
-      const evaluation = subjectData[difficulty]
-      const chartLabels = ['Correct', 'Invalid', 'Incorrect']
-      const chartData = [evaluation['correct'], evaluation['invalidChoices'].length, evaluation['incorrect']]
-      add_chart(`${doCapitalize(subjectName)} - ${doCapitalize(difficulty)}`, chartLabels, chartData, `Invalid Answers: ${[...new Set(evaluation['invalidChoices'])].join(', ')}`)
 
+  const mergeEnabled = getArg('merge') == "true"
+  const chartLabels = ['Correct', 'Invalid', 'Incorrect']
+
+  for (const [subjectName, subjectData] of Object.entries(data)) {
+    if (mergeEnabled) {
+      var chartData = [0, 0, 0]
+      var invalidAnswerData = []
+      for (const difficulty of ['low', 'mid', 'high']) {
+        const evaluation = subjectData[difficulty]
+        chartData[0] += evaluation['correct']
+        chartData[1] += evaluation['invalidChoices'].length
+        chartData[2] += evaluation['incorrect']
+        invalidAnswerData = invalidAnswerData.concat(evaluation['invalidChoices'])
+      }
+      console.log(invalidAnswerData)
+      invalidAnswers = [...new Set(invalidAnswerData)].join(', ').slice(0, 200) || "None"
+      addChart(`${doCapitalize(subjectName)}`, chartLabels, chartData, `Invalid Answers: ${invalidAnswers}`, `${getCorrectPercent(chartData).toFixed(2)}% Correct`)
+    }
+    else {
+      for (const difficulty of ['low', 'mid', 'high']) {
+        const evaluation = subjectData[difficulty]
+        const chartData = [evaluation['correct'], evaluation['invalidChoices'].length, evaluation['incorrect']]
+        const invalidAnswers = [...new Set(evaluation['invalidChoices'])].join(', ').slice(0, 200) || "None"
+        addChart(`${doCapitalize(subjectName)} - ${doCapitalize(difficulty)}`, chartLabels, chartData, `Invalid Answers: ${invalidAnswers}`, `${getCorrectPercent(chartData).toFixed(2)}% Correct`)
+
+      }
     }
   }
 }
 
 Chart.defaults.color = "#ffffff";
 
-function add_chart(chartTitle, chartLabels, chartData, textDescription) {
+function addChart(chartTitle, chartLabels, chartData, incorrectAnswers, textDescription) {
   const graphingArea = document.getElementById('graphingArea')
 
   const graphBox = document.createElement('div')
-  graphBox.classList.add('graphBox')
-  
-  const description = document.createElement('p')
-  description.classList.add('graphDescription')
-  description.innerHTML = textDescription
+  graphBox.classList.add('graphBox')  
 
   const graphCanvasContainer = document.createElement('div')
   graphCanvasContainer.classList.add('graphCanvasContainer')
 
   const graphCanvas = document.createElement('canvas')
   graphCanvas.id = `evalChart-${chartTitle}`
+
+  const description = document.createElement('div')
+  description.classList.add('graphDescription')
+  description.innerHTML = `<p class="textDesc">${textDescription}</p><p class="incorrectAns">${incorrectAnswers}</p>`
+  
 
   const ctx = graphCanvas.getContext('2d');
 
@@ -86,12 +124,22 @@ function add_chart(chartTitle, chartLabels, chartData, textDescription) {
         title: {
           display: true,
           text: chartTitle,
-        }
+        }, 
       }
     }
   };
+  // console.log(ctx)
+
+  // //const centerX = chart.width / 2;
+  // // const centerY = chart.height / 2;
+
+  // ctx.font = "20px Sarabun"
+  // ctx.fillStyle = "#ffffff"; // Set text color (black)
+  // ctx.textAlign = 'center';
+  // ctx.fillText("HELLO", 100, 100)
   
   new Chart(ctx, config);
+
 
   graphCanvasContainer.appendChild(graphCanvas)
   graphBox.appendChild(graphCanvasContainer)

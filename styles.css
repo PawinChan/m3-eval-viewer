@@ -46,7 +46,10 @@ input {
 
 .graphCanvasContainer {
   width: 16em; height: 16em;
+  margin: auto
 }
+
+
 
 .graphBox {
   padding: 1em;
@@ -57,12 +60,28 @@ input {
 
 .graphDescription {
   text-align: center;
-  font-size: 0.8em;
-  color: #909090;
+  margin: auto;
   margin-top: 1.5em;
   margin-bottom: 0;
+  max-width: 20em;
 }
 
+/* .graphDescription > p {
+  margin: auto;
+  display: block;
+} */
 nonexistent {
   color: hsla(136, 55%, 43%, 0.509), hsl(45, 90%, 50%), hsl(5, 75%, 56%)
+}
+
+.textDesc {
+  font-size: 1.1em;
+  text-decoration: underline;
+  
+
+}
+
+.incorrectAns {
+  font-size: 0.8em;
+  color: #909090;
 }
